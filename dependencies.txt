@@ -1,0 +1,8 @@
+minikube version: v1.37.0
+Python 3.14.0
+prometheus, version 2.55.1
+grafana version 10.2.6
+Docker version 29.0.1
+Client Version: v1.34.3
+Kustomize Version: v5.7.1
+helm Version: v3.19.0
