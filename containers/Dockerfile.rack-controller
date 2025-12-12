@@ -1,0 +1,22 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements-python.txt .
+RUN pip install --no-cache-dir -r requirements-python.txt
+
+# Copy source code
+COPY src/ ./src/
+
+# Copy entrypoint
+COPY containers/entrypoints/rack_controller_entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV PYTHONPATH=/app/src
+ENV PYTHONUNBUFFERED=1
+
+# Expose UDP port for server agent packets
+EXPOSE 9999/udp
+
+ENTRYPOINT ["/entrypoint.sh"]

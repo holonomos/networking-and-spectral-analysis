@@ -1,0 +1,534 @@
+version: "3.8"
+
+networks:
+  netwatch-net:
+    driver: bridge
+
+services:
+  # ==================== DC Controller ====================
+  dc-controller:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.dc-controller
+    container_name: dc-controller
+    networks:
+      - netwatch-net
+    environment:
+      - DC_ID=0
+      - TCP_LISTEN_PORT=9990
+      - NUM_RACKS=4
+    ports:
+      - "9990:9990"
+
+  # ==================== Rack Controllers ====================
+  rack-controller-0:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.rack-controller
+    container_name: rack-controller-0
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - UDP_LISTEN_PORT=9999
+      - DC_CONTROLLER_HOST=dc-controller
+      - DC_CONTROLLER_PORT=9990
+    depends_on:
+      - dc-controller
+
+  rack-controller-1:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.rack-controller
+    container_name: rack-controller-1
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - UDP_LISTEN_PORT=9999
+      - DC_CONTROLLER_HOST=dc-controller
+      - DC_CONTROLLER_PORT=9990
+    depends_on:
+      - dc-controller
+
+  rack-controller-2:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.rack-controller
+    container_name: rack-controller-2
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - UDP_LISTEN_PORT=9999
+      - DC_CONTROLLER_HOST=dc-controller
+      - DC_CONTROLLER_PORT=9990
+    depends_on:
+      - dc-controller
+
+  rack-controller-3:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.rack-controller
+    container_name: rack-controller-3
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - UDP_LISTEN_PORT=9999
+      - DC_CONTROLLER_HOST=dc-controller
+      - DC_CONTROLLER_PORT=9990
+    depends_on:
+      - dc-controller
+
+  # ==================== Rack 0 Servers ====================
+  server-r0-s0:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=0
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s1:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=1
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s2:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=2
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s3:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=3
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s4:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=4
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s5:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=5
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s6:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=6
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  server-r0-s7:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=0
+      - SERVER_ID=7
+      - RACK_CONTROLLER_HOST=rack-controller-0
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-0
+
+  # ==================== Rack 1 Servers ====================
+  server-r1-s0:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=0
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s1:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=1
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s2:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=2
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s3:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=3
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s4:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=4
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s5:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=5
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s6:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=6
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  server-r1-s7:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=1
+      - SERVER_ID=7
+      - RACK_CONTROLLER_HOST=rack-controller-1
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-1
+
+  # ==================== Rack 2 Servers ====================
+  server-r2-s0:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=0
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s1:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=1
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s2:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=2
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s3:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=3
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s4:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=4
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s5:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=5
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s6:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=6
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  server-r2-s7:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=2
+      - SERVER_ID=7
+      - RACK_CONTROLLER_HOST=rack-controller-2
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-2
+
+  # ==================== Rack 3 Servers ====================
+  server-r3-s0:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=0
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s1:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=1
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s2:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=2
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s3:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=3
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s4:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=4
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s5:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=5
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s6:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=6
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3
+
+  server-r3-s7:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.server
+    networks:
+      - netwatch-net
+    environment:
+      - RACK_ID=3
+      - SERVER_ID=7
+      - RACK_CONTROLLER_HOST=rack-controller-3
+      - RACK_CONTROLLER_PORT=9999
+    depends_on:
+      - rack-controller-3

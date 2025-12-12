@@ -1,0 +1,22 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements-python.txt .
+RUN pip install --no-cache-dir -r requirements-python.txt
+
+# Copy source code
+COPY src/ ./src/
+
+# Copy entrypoint
+COPY containers/entrypoints/dc_controller_entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV PYTHONPATH=/app/src
+ENV PYTHONUNBUFFERED=1
+
+# Expose TCP port for rack controller reports
+EXPOSE 9990/tcp
+
+ENTRYPOINT ["/entrypoint.sh"]
