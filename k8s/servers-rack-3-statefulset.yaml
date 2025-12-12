@@ -20,6 +20,9 @@ spec:
         - name: server
           image: netwatch-server:local
           imagePullPolicy: Never
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
           command: ["/bin/bash", "-c"]
           args:
             - |
