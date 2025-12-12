@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rack-controller-0
+  namespace: netwatch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rack-controller
+      rack: "0"
+  template:
+    metadata:
+      labels:
+        app: rack-controller
+        rack: "0"
+    spec:
+      containers:
+        - name: rack-controller
+          image: netwatch-rack-controller:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9999
+              protocol: UDP
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: RACK_ID
+              value: "0"
+            - name: UDP_LISTEN_PORT
+              value: "9999"
+            - name: DC_CONTROLLER_HOST
+              value: "dc-controller"
+            - name: DC_CONTROLLER_PORT
+              value: "9990"
+            - name: METRICS_PORT
+              value: "8000"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rack-controller-1
+  namespace: netwatch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rack-controller
+      rack: "1"
+  template:
+    metadata:
+      labels:
+        app: rack-controller
+        rack: "1"
+    spec:
+      containers:
+        - name: rack-controller
+          image: netwatch-rack-controller:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9999
+              protocol: UDP
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: RACK_ID
+              value: "1"
+            - name: UDP_LISTEN_PORT
+              value: "9999"
+            - name: DC_CONTROLLER_HOST
+              value: "dc-controller"
+            - name: DC_CONTROLLER_PORT
+              value: "9990"
+            - name: METRICS_PORT
+              value: "8000"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rack-controller-2
+  namespace: netwatch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rack-controller
+      rack: "2"
+  template:
+    metadata:
+      labels:
+        app: rack-controller
+        rack: "2"
+    spec:
+      containers:
+        - name: rack-controller
+          image: netwatch-rack-controller:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9999
+              protocol: UDP
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: RACK_ID
+              value: "2"
+            - name: UDP_LISTEN_PORT
+              value: "9999"
+            - name: DC_CONTROLLER_HOST
+              value: "dc-controller"
+            - name: DC_CONTROLLER_PORT
+              value: "9990"
+            - name: METRICS_PORT
+              value: "8000"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rack-controller-3
+  namespace: netwatch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rack-controller
+      rack: "3"
+  template:
+    metadata:
+      labels:
+        app: rack-controller
+        rack: "3"
+    spec:
+      containers:
+        - name: rack-controller
+          image: netwatch-rack-controller:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9999
+              protocol: UDP
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: RACK_ID
+              value: "3"
+            - name: UDP_LISTEN_PORT
+              value: "9999"
+            - name: DC_CONTROLLER_HOST
+              value: "dc-controller"
+            - name: DC_CONTROLLER_PORT
+              value: "9990"
+            - name: METRICS_PORT
+              value: "8000"

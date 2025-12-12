@@ -17,6 +17,7 @@ services:
       - DC_ID=0
       - TCP_LISTEN_PORT=9990
       - NUM_RACKS=4
+      - METRICS_PORT=8000
     ports:
       - "9990:9990"
 
@@ -33,6 +34,7 @@ services:
       - UDP_LISTEN_PORT=9999
       - DC_CONTROLLER_HOST=dc-controller
       - DC_CONTROLLER_PORT=9990
+      - METRICS_PORT=8000
     depends_on:
       - dc-controller
 
@@ -48,6 +50,7 @@ services:
       - UDP_LISTEN_PORT=9999
       - DC_CONTROLLER_HOST=dc-controller
       - DC_CONTROLLER_PORT=9990
+      - METRICS_PORT=8000
     depends_on:
       - dc-controller
 
@@ -63,6 +66,7 @@ services:
       - UDP_LISTEN_PORT=9999
       - DC_CONTROLLER_HOST=dc-controller
       - DC_CONTROLLER_PORT=9990
+      - METRICS_PORT=8000
     depends_on:
       - dc-controller
 
@@ -78,6 +82,7 @@ services:
       - UDP_LISTEN_PORT=9999
       - DC_CONTROLLER_HOST=dc-controller
       - DC_CONTROLLER_PORT=9990
+      - METRICS_PORT=8000
     depends_on:
       - dc-controller
 
@@ -532,3 +537,38 @@ services:
       - RACK_CONTROLLER_PORT=9999
     depends_on:
       - rack-controller-3
+
+  # ==================== Monitoring ====================
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: prometheus
+    networks:
+      - netwatch-net
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - dc-controller
+      - rack-controller-0
+      - rack-controller-1
+      - rack-controller-2
+      - rack-controller-3
+
+  grafana:
+    image: grafana/grafana:10.2.6
+    container_name: grafana
+    networks:
+      - netwatch-net
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus

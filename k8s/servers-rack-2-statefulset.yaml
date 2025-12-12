@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: server-rack-2
+  namespace: netwatch
+spec:
+  serviceName: server-rack-2
+  replicas: 8
+  selector:
+    matchLabels:
+      app: server
+      rack: "2"
+  template:
+    metadata:
+      labels:
+        app: server
+        rack: "2"
+    spec:
+      containers:
+        - name: server
+          image: netwatch-server:local
+          imagePullPolicy: Never
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              export SERVER_ID=${HOSTNAME##*-}
+              exec python -m netwatch.server_agent
+          env:
+            - name: RACK_ID
+              value: "2"
+            - name: RACK_CONTROLLER_HOST
+              value: "rack-controller-2"
+            - name: RACK_CONTROLLER_PORT
+              value: "9999"

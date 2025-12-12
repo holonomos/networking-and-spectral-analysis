@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dc-controller
+  namespace: netwatch
+spec:
+  selector:
+    app: dc-controller
+  ports:
+    - name: tcp
+      port: 9990
+      targetPort: 9990
+      protocol: TCP
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rack-controller-0
+  namespace: netwatch
+spec:
+  selector:
+    app: rack-controller
+    rack: "0"
+  ports:
+    - name: udp
+      port: 9999
+      targetPort: 9999
+      protocol: UDP
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rack-controller-1
+  namespace: netwatch
+spec:
+  selector:
+    app: rack-controller
+    rack: "1"
+  ports:
+    - name: udp
+      port: 9999
+      targetPort: 9999
+      protocol: UDP
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rack-controller-2
+  namespace: netwatch
+spec:
+  selector:
+    app: rack-controller
+    rack: "2"
+  ports:
+    - name: udp
+      port: 9999
+      targetPort: 9999
+      protocol: UDP
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rack-controller-3
+  namespace: netwatch
+spec:
+  selector:
+    app: rack-controller
+    rack: "3"
+  ports:
+    - name: udp
+      port: 9999
+      targetPort: 9999
+      protocol: UDP
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: netwatch
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: netwatch
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000

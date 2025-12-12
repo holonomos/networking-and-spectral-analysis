@@ -11,6 +11,7 @@ from typing import Deque, Dict, List, Tuple
 from netwatch.config import RackControllerConfig
 from netwatch.logging_utils import get_logger
 from netwatch.fft_utils import analyze_signal, classify_health, compute_rack_health_score
+from netwatch.metrics_utils import MetricsRegistry
 
 logger = get_logger("rack_controller")
 
@@ -251,8 +252,20 @@ class RackController:
                     )
                     spectral_errors.append(summary["spectral_error"])
 
+                    # Update Prometheus metrics for this server
+                    MetricsRegistry.update_server_metrics(
+                        rack_id=self.cfg.rack_id,
+                        server_id=server_id,
+                        spectral_error=summary["spectral_error"],
+                        snr_db=summary["spectral_snr_db"],
+                        latency_ms=summary["latency_mean_ms"],
+                    )
+
                 rack_health = compute_rack_health_score(spectral_errors)
                 logger.info("Rack %d health_score=%.3f", self.cfg.rack_id, rack_health)
+
+                # Update Prometheus rack health metric
+                MetricsRegistry.update_rack_health(self.cfg.rack_id, rack_health)
 
                 # Report to DC Controller
                 self._report_to_dc(rack_health, len(self.server_stats))
@@ -263,6 +276,11 @@ class RackController:
 
 def main() -> None:
     cfg = RackControllerConfig.from_env()
+
+    # Start Prometheus metrics HTTP server
+    MetricsRegistry.start_server(port=cfg.metrics_port)
+    logger.info("Metrics server started on port %d", cfg.metrics_port)
+
     controller = RackController(cfg, sample_rate_hz=20.0)
 
     t = threading.Thread(

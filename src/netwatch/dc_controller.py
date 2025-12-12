@@ -16,6 +16,7 @@ from typing import Dict
 from netwatch.config import DCControllerConfig
 from netwatch.logging_utils import get_logger
 from netwatch.fft_utils import compute_dc_health_score
+from netwatch.metrics_utils import MetricsRegistry
 
 logger = get_logger("dc_controller")
 
@@ -150,12 +151,19 @@ class DCController:
                         dc_score,
                         dc_health,
                     )
+                    # Update Prometheus DC health metric
+                    MetricsRegistry.update_dc_health(self.cfg.dc_id, dc_score)
                 else:
                     logger.warning("DC %d: All rack reports are stale", self.cfg.dc_id)
 
 
 def main() -> None:
     cfg = DCControllerConfig.from_env()
+
+    # Start Prometheus metrics HTTP server
+    MetricsRegistry.start_server(port=cfg.metrics_port)
+    logger.info("Metrics server started on port %d", cfg.metrics_port)
+
     controller = DCController(cfg=cfg)
 
     # Start TCP server in background

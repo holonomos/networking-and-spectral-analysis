@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: netwatch
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 2s
+      evaluation_interval: 2s
+
+    scrape_configs:
+      - job_name: 'rack-controllers'
+        static_configs:
+          - targets:
+              - 'rack-controller-0:8000'
+              - 'rack-controller-1:8000'
+              - 'rack-controller-2:8000'
+              - 'rack-controller-3:8000'
+
+      - job_name: 'dc-controller'
+        static_configs:
+          - targets:
+              - 'dc-controller:8000'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: netwatch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.55.1
+          args:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
