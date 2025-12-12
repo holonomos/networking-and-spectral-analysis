@@ -114,6 +114,8 @@ class RackController:
         self.server_stats: Dict[int, ServerStats] = {}
         # For per-window arrival rate estimates
         self._window_counts: Dict[int, int] = {}
+        # TCP socket for reporting to DC Controller (lazy init)
+        self._dc_socket: socket.socket | None = None
 
     def _get_server_stats(self, server_id: int) -> ServerStats:
         with self._lock:
@@ -123,6 +125,37 @@ class RackController:
                 self.server_stats[server_id] = stats
                 self._window_counts[server_id] = 0
             return stats
+
+    def _report_to_dc(self, health_score: float, server_count: int) -> None:
+        """Send health report to DC Controller via TCP."""
+        report = {
+            "rack_id": self.cfg.rack_id,
+            "health_score": health_score,
+            "server_count": server_count,
+            "timestamp": time.time(),
+        }
+        msg = json.dumps(report) + "\n"
+        try:
+            if self._dc_socket is None:
+                self._dc_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._dc_socket.connect(
+                    (self.cfg.dc_controller_host, self.cfg.dc_controller_port)
+                )
+                logger.info(
+                    "Connected to DC Controller at %s:%d",
+                    self.cfg.dc_controller_host,
+                    self.cfg.dc_controller_port,
+                )
+            self._dc_socket.sendall(msg.encode("utf-8"))
+        except Exception as e:
+            logger.warning("Failed to report to DC Controller: %s", e)
+            # Reset socket for reconnection
+            if self._dc_socket:
+                try:
+                    self._dc_socket.close()
+                except Exception:
+                    pass
+                self._dc_socket = None
 
     def run_udp_listener(self) -> None:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -220,6 +253,10 @@ class RackController:
 
                 rack_health = compute_rack_health_score(spectral_errors)
                 logger.info("Rack %d health_score=%.3f", self.cfg.rack_id, rack_health)
+
+                # Report to DC Controller
+                self._report_to_dc(rack_health, len(self.server_stats))
+
                 # Reset window counts for next interval
                 self._window_counts = {sid: 0 for sid in self._window_counts.keys()}
 

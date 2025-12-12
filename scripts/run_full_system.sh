@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run the full NetWatch system: 4 racks × 8 servers = 32 agents
+# Run the full NetWatch system: DC Controller + 4 racks × 8 servers = 37 processes
 
 set -e
 
@@ -9,7 +9,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="$PROJECT_ROOT/src"
 
 echo "=== Starting NetWatch Full System Test ==="
-echo "4 Rack Controllers + 32 Server Agents"
+echo "1 DC Controller + 4 Rack Controllers + 32 Server Agents"
 echo ""
 
 PIDS=()
@@ -25,11 +25,19 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# Start DC Controller first
+echo "Starting DC Controller on port 9990..."
+DC_ID=0 TCP_LISTEN_PORT=9990 NUM_RACKS=4 \
+    python3 -m netwatch.dc_controller &
+PIDS+=($!)
+sleep 0.5
+
 # Start 4 Rack Controllers (each on different ports)
 for rack_id in 0 1 2 3; do
     port=$((9999 + rack_id))
     echo "Starting Rack Controller $rack_id on port $port..."
     RACK_ID=$rack_id UDP_LISTEN_PORT=$port \
+        DC_CONTROLLER_HOST=127.0.0.1 DC_CONTROLLER_PORT=9990 \
         python3 -m netwatch.rack_controller &
     PIDS+=($!)
     sleep 0.2
@@ -52,7 +60,7 @@ for rack_id in 0 1 2 3; do
 done
 
 echo ""
-echo "=== All 36 processes started ==="
+echo "=== All 37 processes started ==="
 echo "Press Ctrl+C to stop all processes"
 echo ""
 

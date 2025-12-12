@@ -214,3 +214,21 @@ def compute_rack_health_score(server_spectral_errors: list[float]) -> float:
     
     avg_error = sum(server_spectral_errors) / len(server_spectral_errors)
     return max(0.0, min(1.0, 1.0 - avg_error))
+
+
+def compute_dc_health_score(rack_health_scores: list[float]) -> float:
+    """
+    Compute overall datacenter health score from rack health scores.
+    
+    Args:
+        rack_health_scores: List of health scores for each rack
+        
+    Returns:
+        Datacenter health score between 0 (all failed) and 1 (all healthy)
+    """
+    if not rack_health_scores:
+        return 0.0
+    
+    # Simple average for now; could add weighting by rack size
+    return sum(rack_health_scores) / len(rack_health_scores)
+
