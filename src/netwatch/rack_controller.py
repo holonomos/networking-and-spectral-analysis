@@ -82,13 +82,15 @@ class ServerStats:
         arrival_rate_hz = packets_in_window / max(window_seconds, 1e-6)
 
         # Spectral health using fft_utils.analyze_signal
-        if len(self.wave_buffer) >= 64:
+        if len(self.wave_buffer) >= 256:
             samples_arr = np.array(self.wave_buffer, dtype=float)
+            # Bandwidth scales with frequency (5% of expected) to handle timing jitter
+            bandwidth = max(0.1, expected_freq_hz * 0.05)
             metrics = analyze_signal(
                 samples=samples_arr,
                 sample_rate=sample_rate_hz,
                 expected_freq=expected_freq_hz,
-                bandwidth=0.1,
+                bandwidth=bandwidth,
             )
             spectral_error = metrics.spectral_error
             snr_db = metrics.snr
